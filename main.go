@@ -1,5 +1,7 @@
 package main
 
+// See: http://www.sqlitetutorial.net/sqlite-date/
+
 import (
 	"database/sql"
 	"time"
@@ -27,7 +29,6 @@ func createTable(db *sql.DB) sql.Result {
 }
 
 func insertNewRecord(db *sql.DB) sql.Result {
-	// http://www.sqlitetutorial.net/sqlite-date/
 	stmt, err := db.Prepare("INSERT INTO tracker (date, start_time) VALUES (DATE('now', 'localtime'), TIME('now', 'localtime'))")
 	checkErr(err)
 	res, err := stmt.Exec()
@@ -59,9 +60,10 @@ func main() {
 	db := connect()
 	createTable(db)
 
-	id, date := getLastRecord(db)
+	id, recordDate := getLastRecord(db)
 	currentDate := time.Now().Local().Format("2006-01-02")
-	if currentDate != date {
+
+	if currentDate != recordDate {
 		insertNewRecord(db)
 	} else {
 		updateTodaysRecord(db, id)
