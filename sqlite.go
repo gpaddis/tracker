@@ -19,6 +19,7 @@ type record struct {
 	date      string
 	startTime string
 	endTime   string
+	pause     int
 }
 
 func connect(dbName string) *connection {
@@ -35,12 +36,12 @@ func (c connection) executeStmt(statement string) sql.Result {
 }
 
 func (c connection) createTable() sql.Result {
-	stmt := "CREATE TABLE IF NOT EXISTS tracker (id INTEGER PRIMARY KEY, date TEXT, start_time TEXT, end_time TEXT)"
+	stmt := "CREATE TABLE IF NOT EXISTS tracker (id INTEGER PRIMARY KEY, date TEXT, start_time TEXT, end_time TEXT, pause INTEGER)"
 	return c.executeStmt(stmt)
 }
 
 func (c connection) insertNewRecord() sql.Result {
-	return c.executeStmt("INSERT INTO tracker (date, start_time) VALUES (DATE('now', 'localtime'), TIME('now', 'localtime'))")
+	return c.executeStmt("INSERT INTO tracker (date, start_time, end_time, pause) VALUES (DATE('now', 'localtime'), TIME('now', 'localtime'), TIME('now', 'localtime'), 60)")
 }
 
 func (c connection) updateRecord(id int) sql.Result {
@@ -51,12 +52,12 @@ func (c connection) updateRecord(id int) sql.Result {
 	return res
 }
 
-func (c connection) getLastRecord() *record {
+func (c *connection) getLastRecord() *record {
 	row, err := c.Query("SELECT * FROM tracker ORDER BY id DESC LIMIT 1")
 	checkErr(err)
 	r := new(record)
 	for row.Next() {
-		err := row.Scan(&r.id, &r.date, &r.startTime, &r.endTime)
+		err := row.Scan(&r.id, &r.date, &r.startTime, &r.endTime, &r.pause)
 		checkErr(err)
 	}
 	return r
@@ -67,8 +68,16 @@ func (c connection) getRecordByDay(day string) *record {
 	checkErr(err)
 	r := new(record)
 	for row.Next() {
-		err := row.Scan(&r.id, &r.date, &r.startTime, &r.endTime)
+		err := row.Scan(&r.id, &r.date, &r.startTime, &r.endTime, &r.pause)
 		checkErr(err)
 	}
 	return r
+}
+
+func (c connection) setPause(day string, pause int) sql.Result {
+	stmt, err := c.Prepare("UPDATE tracker SET pause = ? WHERE date = ?")
+	checkErr(err)
+	res, err := stmt.Exec(pause, day)
+	checkErr(err)
+	return res
 }
