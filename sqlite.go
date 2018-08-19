@@ -47,6 +47,7 @@ func (c connection) updateRecord(id int) sql.Result {
 	stmt, err := c.Prepare("UPDATE tracker SET end_time = TIME('now', 'localtime') WHERE id = ?")
 	checkErr(err)
 	res, err := stmt.Exec(id)
+	checkErr(err)
 	return res
 }
 
