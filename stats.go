@@ -28,10 +28,19 @@ func printStats(timeSpan string, conn *connection) {
 
 func calculateDuration(r *record) time.Duration {
 	dateFormat := "2006-01-0215:04:05"
+
 	start, err := time.Parse(dateFormat, r.date+r.startTime)
 	checkErr(err)
+
 	end, err := time.Parse(dateFormat, r.date+r.endTime)
 	checkErr(err)
+
+	pause, err := time.ParseDuration(r.pause)
+	checkErr(err)
+
 	delta := end.Sub(start)
+	if delta > pause {
+		delta -= pause
+	}
 	return delta
 }

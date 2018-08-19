@@ -6,6 +6,7 @@ package main
 
 import (
 	"database/sql"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -19,7 +20,7 @@ type record struct {
 	date      string
 	startTime string
 	endTime   string
-	pause     int
+	pause     string
 }
 
 func connect(dbName string) *connection {
@@ -36,12 +37,13 @@ func (c connection) executeStmt(statement string) sql.Result {
 }
 
 func (c connection) createTable() sql.Result {
-	stmt := "CREATE TABLE IF NOT EXISTS tracker (id INTEGER PRIMARY KEY, date TEXT, start_time TEXT, end_time TEXT, pause INTEGER)"
+	stmt := "CREATE TABLE IF NOT EXISTS tracker (id INTEGER PRIMARY KEY, date TEXT, start_time TEXT, end_time TEXT, pause TEXT)"
 	return c.executeStmt(stmt)
 }
 
 func (c connection) insertNewRecord() sql.Result {
-	return c.executeStmt("INSERT INTO tracker (date, start_time, end_time, pause) VALUES (DATE('now', 'localtime'), TIME('now', 'localtime'), TIME('now', 'localtime'), 60)")
+	stmt := "INSERT INTO tracker (date, start_time, end_time, pause) VALUES (DATE('now', 'localtime'), TIME('now', 'localtime'), TIME('now', 'localtime'), '60m')"
+	return c.executeStmt(stmt)
 }
 
 func (c connection) updateRecord(id int) sql.Result {
@@ -74,7 +76,10 @@ func (c connection) getRecordByDay(day string) *record {
 	return r
 }
 
-func (c connection) setPause(day string, pause int) sql.Result {
+func (c connection) setPause(day string, pause string) sql.Result {
+	_, err := time.ParseDuration(pause)
+	checkErr(err)
+
 	stmt, err := c.Prepare("UPDATE tracker SET pause = ? WHERE date = ?")
 	checkErr(err)
 	res, err := stmt.Exec(pause, day)

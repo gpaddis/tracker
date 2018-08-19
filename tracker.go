@@ -19,7 +19,7 @@ func track(conn *connection) {
 	}
 }
 
-func updatePause(conn *connection, pause int) {
+func updatePause(conn *connection, pause string) {
 	rec := conn.getLastRecord()
 	if rec.date == today() {
 		conn.setPause(rec.date, pause)
@@ -28,7 +28,7 @@ func updatePause(conn *connection, pause int) {
 
 func main() {
 	trackPtr := flag.Bool("track", false, "Track the current date and time")
-	pausePtr := flag.Int("pause", 0, "Set the pause for today (in minutes)")
+	pausePtr := flag.String("pause", "", "Set the pause for today (use a time string like 30m or 1h10m)")
 	statsPtr := flag.String("stats", "", "Print the statistics")
 	flag.Parse()
 
@@ -41,7 +41,7 @@ func main() {
 	}
 
 	// ./tracker --pause {minutes}
-	if *pausePtr != 0 {
+	if *pausePtr != "" {
 		updatePause(conn, *pausePtr)
 	}
 
