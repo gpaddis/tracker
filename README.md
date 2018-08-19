@@ -1,0 +1,1 @@
+This program creates a record per day with a start time and and end time. If a record for that day is already present, it updates the end time when the program is executed.
