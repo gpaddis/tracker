@@ -14,6 +14,13 @@ type connection struct {
 	*sql.DB
 }
 
+type record struct {
+	id        int
+	date      string
+	startTime string
+	endTime   string
+}
+
 func connect(dbName string) *connection {
 	conn, err := sql.Open("sqlite3", dbName)
 	checkErr(err)
@@ -57,19 +64,13 @@ func (c connection) getLastRecord() (int, string) {
 	return id, date
 }
 
-func (c connection) getRecordByDay(day string) (int, string, string, string) {
+func (c connection) getRecordByDay(day string) *record {
 	row, err := c.Query("SELECT * FROM tracker WHERE date = ? LIMIT 1", day)
 	checkErr(err)
-
-	var id int
-	var date string
-	var startTime string
-	var endTime string
-
+	r := new(record)
 	for row.Next() {
-		err := row.Scan(&id, &date, &startTime, &endTime)
+		err := row.Scan(&r.id, &r.date, &r.startTime, &r.endTime)
 		checkErr(err)
 	}
-
-	return id, date, startTime, endTime
+	return r
 }

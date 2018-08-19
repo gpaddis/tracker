@@ -10,9 +10,9 @@ func printStats(timeSpan string, conn *connection) {
 	switch timeSpan {
 	case "today":
 		today := time.Now().Local().Format("2006-01-02")
-		_, date, start, end := conn.getRecordByDay(today)
-		duration := calculateDuration(date, start, end)
-		fmt.Println("Stats for today:", duration.String())
+		rec := conn.getRecordByDay(today)
+		dur := calculateDuration(rec)
+		fmt.Println("Stats for today:", dur.String())
 	case "yesterday":
 		fmt.Println("Yesterday")
 	case "thisweek":
@@ -24,11 +24,11 @@ func printStats(timeSpan string, conn *connection) {
 	}
 }
 
-func calculateDuration(date string, startTime string, endTime string) time.Duration {
+func calculateDuration(r *record) time.Duration {
 	dateFormat := "2006-01-0215:04:05"
-	start, err := time.Parse(dateFormat, date+startTime)
+	start, err := time.Parse(dateFormat, r.date+r.startTime)
 	checkErr(err)
-	end, err := time.Parse(dateFormat, date+endTime)
+	end, err := time.Parse(dateFormat, r.date+r.endTime)
 	checkErr(err)
 	delta := end.Sub(start)
 	return delta
