@@ -1,6 +1,9 @@
 package main
 
-import "time"
+import (
+	"flag"
+	"time"
+)
 
 func checkErr(err error) {
 	if err != nil {
@@ -8,10 +11,7 @@ func checkErr(err error) {
 	}
 }
 
-func main() {
-	conn := connect("test.sqlite")
-	conn.createTable()
-
+func track(conn *connection) {
 	id, recordDate := conn.getLastRecord()
 	currentDate := time.Now().Local().Format("2006-01-02")
 
@@ -19,5 +19,18 @@ func main() {
 		conn.insertNewRecord()
 	} else {
 		conn.updateRecord(id)
+	}
+}
+
+func main() {
+	trackPtr := flag.Bool("track", false, "Track the current date and time")
+	flag.Parse()
+
+	conn := connect("test.sqlite")
+	conn.createTable()
+
+	// ./tracker --track
+	if *trackPtr == true {
+		track(conn)
 	}
 }
