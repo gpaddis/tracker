@@ -50,18 +50,15 @@ func (c connection) updateRecord(id int) sql.Result {
 	return res
 }
 
-func (c connection) getLastRecord() (int, string) {
-	row, err := c.Query("SELECT id, date FROM tracker ORDER BY id DESC LIMIT 1")
+func (c connection) getLastRecord() *record {
+	row, err := c.Query("SELECT * FROM tracker ORDER BY id DESC LIMIT 1")
 	checkErr(err)
-
-	var id int
-	var date string
-
+	r := new(record)
 	for row.Next() {
-		err := row.Scan(&id, &date)
+		err := row.Scan(&r.id, &r.date, &r.startTime, &r.endTime)
 		checkErr(err)
 	}
-	return id, date
+	return r
 }
 
 func (c connection) getRecordByDay(day string) *record {

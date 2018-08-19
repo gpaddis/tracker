@@ -12,13 +12,13 @@ func checkErr(err error) {
 }
 
 func track(conn *connection) {
-	id, recordDate := conn.getLastRecord()
+	rec := conn.getLastRecord()
 	currentDate := time.Now().Local().Format("2006-01-02")
 
-	if currentDate != recordDate {
+	if currentDate != rec.date {
 		conn.insertNewRecord()
 	} else {
-		conn.updateRecord(id)
+		conn.updateRecord(rec.id)
 	}
 }
 
