@@ -9,15 +9,15 @@ func checkErr(err error) {
 }
 
 func main() {
-	db := connect()
-	createTable(db)
+	conn := connect("test.sqlite")
+	conn.createTable()
 
-	id, recordDate := getLastRecord(db)
+	id, recordDate := conn.getLastRecord()
 	currentDate := time.Now().Local().Format("2006-01-02")
 
 	if currentDate != recordDate {
-		insertNewRecord(db)
+		conn.insertNewRecord()
 	} else {
-		updateTodaysRecord(db, id)
+		conn.updateRecord(id)
 	}
 }
