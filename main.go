@@ -37,6 +37,6 @@ func main() {
 
 	// ./tracker --stats timeSpan
 	if *statsPtr != "" {
-		printStats(*statsPtr)
+		printStats(*statsPtr, conn)
 	}
 }

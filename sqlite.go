@@ -28,7 +28,8 @@ func (c connection) executeStmt(statement string) sql.Result {
 }
 
 func (c connection) createTable() sql.Result {
-	return c.executeStmt("CREATE TABLE IF NOT EXISTS tracker (id INTEGER PRIMARY KEY, date TEXT, start_time TEXT, end_time TEXT)")
+	stmt := "CREATE TABLE IF NOT EXISTS tracker (id INTEGER PRIMARY KEY, date TEXT, start_time TEXT, end_time TEXT)"
+	return c.executeStmt(stmt)
 }
 
 func (c connection) insertNewRecord() sql.Result {
@@ -54,4 +55,21 @@ func (c connection) getLastRecord() (int, string) {
 		checkErr(err)
 	}
 	return id, date
+}
+
+func (c connection) getRecordByDay(day string) (int, string, string, string) {
+	row, err := c.Query("SELECT * FROM tracker WHERE date = ? LIMIT 1", day)
+	checkErr(err)
+
+	var id int
+	var date string
+	var startTime string
+	var endTime string
+
+	for row.Next() {
+		err := row.Scan(&id, &date, &startTime, &endTime)
+		checkErr(err)
+	}
+
+	return id, date, startTime, endTime
 }
