@@ -24,6 +24,7 @@ func track(conn *connection) {
 
 func main() {
 	trackPtr := flag.Bool("track", false, "Track the current date and time")
+	statsPtr := flag.String("stats", "", "Print the statistics")
 	flag.Parse()
 
 	conn := connect("test.sqlite")
@@ -32,5 +33,10 @@ func main() {
 	// ./tracker --track
 	if *trackPtr == true {
 		track(conn)
+	}
+
+	// ./tracker --stats timeSpan
+	if *statsPtr != "" {
+		printStats(*statsPtr)
 	}
 }
