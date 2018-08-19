@@ -1,1 +1,1 @@
-This program creates a record per day with a start time and and end time. If a record for that day is already present, it updates the end time when the program is executed.
+This program creates a record per day with a start time and an end time. If a record for that day is already present in the database, it updates the end time when the program is executed.
