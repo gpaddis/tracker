@@ -9,20 +9,30 @@ func today() string {
 	return time.Now().Local().Format("2006-01-02")
 }
 
+func yesterday() string {
+	return time.Now().Local().AddDate(0, 0, -1).Format("2006-01-02")
+}
+
 func printStats(timeSpan string, conn *connection) {
 	switch timeSpan {
 	case "today":
-		rec := conn.getRecordByDay(today())
-		dur := calculateDuration(rec)
-		fmt.Println("Stats for today:", dur.String())
+		getDailyReport(conn, today())
 	case "yesterday":
-		fmt.Println("Yesterday")
+		getDailyReport(conn, yesterday())
 	case "thisweek":
 		fmt.Println("This week")
 	case "lastweek":
 		fmt.Println("Last week")
 	default:
 		fmt.Println(timeSpan, "is not a valid time span.")
+	}
+}
+
+func getDailyReport(conn *connection, date string) {
+	rec := conn.getRecordByDay(date)
+	if rec.date != "" {
+		dur := calculateDuration(rec)
+		fmt.Println("Stats for "+date+":", dur.String())
 	}
 }
 
@@ -39,7 +49,7 @@ func calculateDuration(r *record) time.Duration {
 	checkErr(err)
 
 	delta := end.Sub(start)
-	if delta > pause {
+	if r.date != today() {
 		delta -= pause
 	}
 	return delta
