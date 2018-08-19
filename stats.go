@@ -5,12 +5,14 @@ import (
 	"time"
 )
 
-func printStats(timeSpan string, conn *connection) {
+func today() string {
+	return time.Now().Local().Format("2006-01-02")
+}
 
+func printStats(timeSpan string, conn *connection) {
 	switch timeSpan {
 	case "today":
-		today := time.Now().Local().Format("2006-01-02")
-		rec := conn.getRecordByDay(today)
+		rec := conn.getRecordByDay(today())
 		dur := calculateDuration(rec)
 		fmt.Println("Stats for today:", dur.String())
 	case "yesterday":
