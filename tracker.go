@@ -13,7 +13,7 @@ func checkErr(err error) {
 func track(conn *connection) {
 	rec := conn.getLastRecord()
 	if rec.date == today() {
-		conn.updateRecord(rec.id)
+		conn.updateRecord(rec)
 	} else {
 		conn.insertNewRecord()
 	}

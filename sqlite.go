@@ -46,10 +46,10 @@ func (c connection) insertNewRecord() sql.Result {
 	return c.executeStmt(stmt)
 }
 
-func (c connection) updateRecord(id int) sql.Result {
+func (c connection) updateRecord(r *record) sql.Result {
 	stmt, err := c.Prepare("UPDATE tracker SET end_time = TIME('now', 'localtime') WHERE id = ?")
 	checkErr(err)
-	res, err := stmt.Exec(id)
+	res, err := stmt.Exec(r.id)
 	checkErr(err)
 	return res
 }
