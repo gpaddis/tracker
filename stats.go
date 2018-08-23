@@ -20,7 +20,7 @@ func printStats(timeSpan string, conn *connection) {
 	case "yesterday":
 		getDailyReport(conn, yesterday())
 	case "thisweek":
-		fmt.Println("This week")
+		getWeeklyReport(conn, today())
 	case "lastweek":
 		fmt.Println("Last week")
 	default:
@@ -33,6 +33,13 @@ func getDailyReport(conn *connection, date string) {
 	if rec.date != "" {
 		dur := calculateDuration(rec)
 		fmt.Println("Stats for "+date+":", dur.String())
+	}
+}
+
+func getWeeklyReport(conn *connection, date string) {
+	weekDays := getWeekDays(date)
+	for _, day := range weekDays {
+		getDailyReport(conn, day)
 	}
 }
 
