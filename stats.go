@@ -54,3 +54,21 @@ func calculateDuration(r *record) time.Duration {
 	}
 	return delta
 }
+
+func getWeekDays(d string) []string {
+	date, err := time.Parse("2006-01-02", d)
+	checkErr(err)
+
+	// Rewind to monday in the week
+	for date.Weekday() != time.Monday {
+		date = date.AddDate(0, 0, -1)
+	}
+
+	result := []string{}
+	for len(result) < 7 {
+		result = append(result, date.Format("2006-01-02"))
+		date = date.AddDate(0, 0, 1)
+	}
+
+	return result
+}
