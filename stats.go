@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+var dailyWorkHours, _ = time.ParseDuration("8h")
+
 func today() string {
 	return time.Now().Local().Format("2006-01-02")
 }
@@ -32,7 +34,9 @@ func getDailyReport(conn *connection, date string) {
 	rec := conn.getRecordByDay(date)
 	if rec.date != "" {
 		dur := calculateDuration(rec)
-		fmt.Println("Stats for "+date+":", dur.String())
+		fmt.Print(date+": ", dur.String(), "\t")
+		balance := dur - dailyWorkHours
+		fmt.Println("Balance:", balance.String())
 	}
 }
 
@@ -55,11 +59,7 @@ func calculateDuration(r *record) time.Duration {
 	pause, err := time.ParseDuration(r.pause)
 	checkErr(err)
 
-	delta := end.Sub(start)
-	if r.date != today() {
-		delta -= pause
-	}
-	return delta
+	return end.Sub(start) - pause
 }
 
 func getWeekDays(d string) []string {
