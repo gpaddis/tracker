@@ -33,8 +33,11 @@ func printStats(timeSpan string, conn *connection) {
 }
 
 func getDailyValues(rec *record) (time.Duration, time.Duration) {
-	workHours := calculateDuration(rec)
-	balance := workHours - dailyWorkHours
+	var workHours, balance time.Duration
+	if rec.date != "" {
+		workHours = calculateDuration(rec)
+		balance = workHours - dailyWorkHours
+	}
 	return workHours, balance
 }
 
@@ -43,23 +46,33 @@ func printDailyReport(conn *connection, date string) {
 	if rec.date != "" {
 		workHours, balance := getDailyValues(rec)
 		fmt.Print(date+": ", workHours.String(), "\t")
-		fmt.Print("Balance: ")
-		if balance < 0 {
-			color.Set(color.FgRed)
-		} else {
-			color.Set(color.FgGreen)
-			fmt.Print("+")
-		}
-		fmt.Println(balance.String())
-		color.Unset()
+		printBalance(balance)
 	}
+}
+
+func printBalance(b time.Duration) {
+	fmt.Print("Balance: ")
+	if b < 0 {
+		color.Set(color.FgRed)
+	} else {
+		color.Set(color.FgGreen)
+		fmt.Print("+")
+	}
+	fmt.Println(b.String())
+	color.Unset()
 }
 
 func printWeeklyReport(conn *connection, date string) {
 	weekDays := getWeekDays(date)
+	var finalBalance time.Duration
 	for _, day := range weekDays {
 		printDailyReport(conn, day)
+		rec := conn.getRecordByDay(day)
+		_, balance := getDailyValues(rec)
+		finalBalance += balance
 	}
+	fmt.Print("\t\t\tWeekly ")
+	printBalance(finalBalance)
 }
 
 func calculateDuration(r *record) time.Duration {
