@@ -32,13 +32,17 @@ func printStats(timeSpan string, conn *connection) {
 	}
 }
 
+func getDailyValues(rec *record) (time.Duration, time.Duration) {
+	workHours := calculateDuration(rec)
+	balance := workHours - dailyWorkHours
+	return workHours, balance
+}
+
 func printDailyReport(conn *connection, date string) {
 	rec := conn.getRecordByDay(date)
 	if rec.date != "" {
-		dur := calculateDuration(rec)
-		fmt.Print(date+": ", dur.String(), "\t")
-
-		balance := dur - dailyWorkHours
+		workHours, balance := getDailyValues(rec)
+		fmt.Print(date+": ", workHours.String(), "\t")
 		fmt.Print("Balance: ")
 		if balance < 0 {
 			color.Set(color.FgRed)
