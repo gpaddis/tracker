@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 var dailyWorkHours, _ = time.ParseDuration("8h")
@@ -35,8 +37,17 @@ func getDailyReport(conn *connection, date string) {
 	if rec.date != "" {
 		dur := calculateDuration(rec)
 		fmt.Print(date+": ", dur.String(), "\t")
+
 		balance := dur - dailyWorkHours
-		fmt.Println("Balance:", balance.String())
+		fmt.Print("Balance: ")
+		if balance < 0 {
+			color.Set(color.FgRed)
+		} else {
+			color.Set(color.FgGreen)
+			fmt.Print("+")
+		}
+		fmt.Println(balance.String())
+		color.Unset()
 	}
 }
 
