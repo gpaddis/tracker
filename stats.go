@@ -24,9 +24,11 @@ func oneWeekAgo() string {
 func printStats(timeSpan string, conn *connection) {
 	switch timeSpan {
 	case "today":
-		printDailyReport(conn, today())
+		workedHours, balance := getWorkedHoursByDay(conn, today())
+		printDailyReport(today(), workedHours, balance)
 	case "yesterday":
-		printDailyReport(conn, yesterday())
+		workedHours, balance := getWorkedHoursByDay(conn, today())
+		printDailyReport(yesterday(), workedHours, balance)
 	case "thisweek":
 		printWeeklyReport(conn, today())
 	case "lastweek":
@@ -36,20 +38,23 @@ func printStats(timeSpan string, conn *connection) {
 	}
 }
 
-func getDailyValues(rec *record) (time.Duration, time.Duration) {
-	var workHours, balance time.Duration
+func getWorkedHours(rec *record) (time.Duration, time.Duration) {
+	var workedHours, balance time.Duration
 	if rec.date != "" {
-		workHours = calculateDuration(rec)
-		balance = workHours - dailyWorkHours
+		workedHours = calculateDuration(rec)
+		balance = workedHours - dailyWorkHours
 	}
-	return workHours, balance
+	return workedHours, balance
 }
 
-func printDailyReport(conn *connection, date string) {
+func getWorkedHoursByDay(conn *connection, date string) (time.Duration, time.Duration) {
 	rec := conn.getRecordByDay(date)
-	if rec.date != "" {
-		workHours, balance := getDailyValues(rec)
-		fmt.Print(date+": ", workHours.String(), "\t")
+	return getWorkedHours(rec)
+}
+
+func printDailyReport(date string, workedHours time.Duration, balance time.Duration) {
+	if workedHours != 0 {
+		fmt.Print(date+": ", workedHours.String(), "\t")
 		printBalance(balance)
 	}
 }
@@ -70,9 +75,8 @@ func printWeeklyReport(conn *connection, date string) {
 	weekDays := getWeekDays(date)
 	var finalBalance time.Duration
 	for _, day := range weekDays {
-		printDailyReport(conn, day)
-		rec := conn.getRecordByDay(day)
-		_, balance := getDailyValues(rec)
+		workedHours, balance := getWorkedHoursByDay(conn, day)
+		printDailyReport(day, workedHours, balance)
 		finalBalance += balance
 	}
 	fmt.Print("\t\t\tWeekly ")
