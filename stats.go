@@ -17,6 +17,10 @@ func yesterday() string {
 	return time.Now().Local().AddDate(0, 0, -1).Format("2006-01-02")
 }
 
+func oneWeekAgo() string {
+	return time.Now().Local().AddDate(0, 0, -7).Format("2006-01-02")
+}
+
 func printStats(timeSpan string, conn *connection) {
 	switch timeSpan {
 	case "today":
@@ -26,7 +30,7 @@ func printStats(timeSpan string, conn *connection) {
 	case "thisweek":
 		printWeeklyReport(conn, today())
 	case "lastweek":
-		fmt.Println("Last week")
+		printWeeklyReport(conn, oneWeekAgo())
 	default:
 		fmt.Println(timeSpan, "is not a valid time span.")
 	}
