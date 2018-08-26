@@ -21,7 +21,7 @@ func oneWeekAgo() string {
 	return time.Now().Local().AddDate(0, 0, -7).Format("2006-01-02")
 }
 
-func printStats(timeSpan string, conn *connection) {
+func printStats(conn *connection, timeSpan string) {
 	switch timeSpan {
 	case "today":
 		workedHours, balance := getWorkedHoursByDay(conn, today())
