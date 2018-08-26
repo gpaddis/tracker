@@ -53,13 +53,12 @@ func getWorkedHoursByDay(conn *connection, date string) (time.Duration, time.Dur
 
 func printDailyReport(date string, workedHours time.Duration, balance time.Duration) {
 	if workedHours != 0 {
-		fmt.Print(date+": ", workedHours.String(), "\t")
+		fmt.Print(date+": ", workedHours.String(), "\tBalance: ")
 		printBalance(balance)
 	}
 }
 
 func printBalance(b time.Duration) {
-	fmt.Print("Balance: ")
 	if b < 0 {
 		color.Set(color.FgRed)
 	} else {
@@ -78,10 +77,11 @@ func printWeeklyReport(conn *connection, date string) {
 		printDailyReport(day, workedHours, balance)
 		finalBalance += balance
 	}
-	fmt.Print("\t\t\tWeekly ")
+	fmt.Print("\t\t\tWeekly Balance: ")
 	printBalance(finalBalance)
 }
 
+// Calculate the duration between start and end time for a given record.
 func calculateDuration(r *record) time.Duration {
 	dateFormat := "2006-01-0215:04:05"
 
@@ -128,7 +128,7 @@ func printBalanceTotal(conn *connection, daysBack int) {
 	}
 
 	balanceTotal := getBalanceTotal(recordCollection)
-	fmt.Printf("Total for the last %d days (including today):\t", daysBack)
+	fmt.Printf("Total balance for the last %d days (including today): ", daysBack)
 	printBalance(balanceTotal)
 }
 
