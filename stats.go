@@ -38,8 +38,7 @@ func printStats(conn *connection, timeSpan string) {
 	}
 }
 
-func getWorkedHours(rec *record) (time.Duration, time.Duration) {
-	var workedHours, balance time.Duration
+func getWorkedHours(rec *record) (workedHours time.Duration, balance time.Duration) {
 	if rec.date != "" {
 		workedHours = calculateDuration(rec)
 		balance = workedHours - dailyWorkHours
@@ -98,8 +97,9 @@ func calculateDuration(r *record) time.Duration {
 	return end.Sub(start) - pause
 }
 
-func getWeekDays(d string) []string {
-	date, err := time.Parse("2006-01-02", d)
+// Get a slice of week days for the day specified.
+func getWeekDays(day string) []string {
+	date, err := time.Parse("2006-01-02", day)
 	checkErr(err)
 
 	// Rewind to monday in the week
@@ -114,4 +114,29 @@ func getWeekDays(d string) []string {
 	}
 
 	return result
+}
+
+// Print the total balance for the given number of days up to the current date.
+func printBalanceTotal(conn *connection, daysBack int) {
+	dateFormat := "2006-01-02"
+	date, _ := time.Parse(dateFormat, today())
+	var recordCollection []record
+	for i := 0; i < daysBack; i++ {
+		currentDate := date.AddDate(0, 0, -i).Format(dateFormat)
+		rec := conn.getRecordByDay(currentDate)
+		recordCollection = append(recordCollection, *rec)
+	}
+
+	balanceTotal := getBalanceTotal(recordCollection)
+	fmt.Printf("Total for the last %d days (including today):\t", daysBack)
+	printBalance(balanceTotal)
+}
+
+// Get the total balance from the given collection of records.
+func getBalanceTotal(recordCollection []record) (totalBalance time.Duration) {
+	for _, r := range recordCollection {
+		_, balance := getWorkedHours(&r)
+		totalBalance += balance
+	}
+	return totalBalance
 }

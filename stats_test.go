@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-func createTestRecord() record {
-	return record{1, "2018-08-20", "10:00:00", "18:00:00", "60m"}
+func createTestRecord(date string) record {
+	return record{1, date, "10:00:00", "18:00:00", "60m"}
 }
 
 func TestGetWeekDays(t *testing.T) {
@@ -36,7 +36,7 @@ func TestGetWeekDays(t *testing.T) {
 }
 
 func TestGetWorkedHours(t *testing.T) {
-	rec := createTestRecord()
+	rec := createTestRecord("2018-08-20")
 	workedHours, balance := getWorkedHours(&rec)
 	expectedWorkedHours, _ := time.ParseDuration("7h")
 	expectedBalance, _ := time.ParseDuration("-1h")
@@ -45,5 +45,17 @@ func TestGetWorkedHours(t *testing.T) {
 	}
 	if balance != expectedBalance {
 		t.Errorf("Expected -1 balance hours, got %s", balance)
+	}
+}
+
+func TestGetBalanceTotal(t *testing.T) {
+	recordCollection := make([]record, 2)
+	recordCollection[0] = createTestRecord(today())
+	recordCollection[1] = createTestRecord(yesterday())
+
+	balance := getBalanceTotal(recordCollection)
+	expectedBalance := time.Duration(-2 * time.Hour)
+	if balance != expectedBalance {
+		t.Errorf("Expected a balance of %s, got %s", expectedBalance, balance)
 	}
 }

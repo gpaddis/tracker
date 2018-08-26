@@ -30,6 +30,7 @@ func main() {
 	trackPtr := flag.Bool("track", false, "Track the current date and time")
 	pausePtr := flag.String("pause", "", "Set the pause for today (use a time string like 30m or 1h10m)")
 	statsPtr := flag.String("stats", "", "Print the statistics")
+	balancePtr := flag.Int("balance", 0, "Print the balance for the last {x} number of days")
 	flag.Parse()
 
 	conn := connect("test.sqlite")
@@ -48,5 +49,10 @@ func main() {
 	// ./tracker --stats {timeSpan}
 	if *statsPtr != "" {
 		printStats(conn, *statsPtr)
+	}
+
+	// ./tracker --balance {daysBack}
+	if *balancePtr != 0 {
+		printBalanceTotal(conn, *balancePtr)
 	}
 }
