@@ -4,14 +4,14 @@ import (
 	"testing"
 )
 
-func setup() *connection {
+func connectToTestDb() *connection {
 	c := connect(":memory:")
 	c.createTable()
 	return c
 }
 
 func TestInsertNewRecord(t *testing.T) {
-	c := setup()
+	c := connectToTestDb()
 	res := c.insertNewRecord()
 	id, _ := res.LastInsertId()
 	if id != 1 {
@@ -20,7 +20,7 @@ func TestInsertNewRecord(t *testing.T) {
 }
 
 func TestUpdateRecord(t *testing.T) {
-	c := setup()
+	c := connectToTestDb()
 	c.insertNewRecord()
 	rec := c.getLastRecord()
 	res := c.updateRecord(rec)
@@ -31,7 +31,7 @@ func TestUpdateRecord(t *testing.T) {
 }
 
 func TestUpdateRecordWithEmptyDatabase(t *testing.T) {
-	c := setup()
+	c := connectToTestDb()
 	rec := c.getLastRecord()
 	res := c.updateRecord(rec)
 	id, _ := res.LastInsertId()
